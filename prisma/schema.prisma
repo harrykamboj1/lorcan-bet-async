@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id                Int                 @id @default(autoincrement())
+  name              String              @unique
+  description       String?
+  price             Decimal
+  createdAt         DateTime            @default(now())
+  createdBy         String?
+  updatedAt         DateTime            @updatedAt
+  updatedBy         String?
+  inventory         Inventory?
+  orderItems        OrderItem[]
+  categories        Category[]          @relation("ProductCategories")
+  ProductCategories ProductCategories[]
+}
+
+model Inventory {
+  id        Int      @id @default(autoincrement())
+  quantity  Int
+  product   Product  @relation(fields: [productId], references: [id])
+  productId Int      @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
+}
+
+model Order {
+  id         Int         @id @default(autoincrement())
+  status     OrderStatus
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  orderItems OrderItem[]
+  orderLogs  OrderLogs[]
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  quantity  Int
+  order     Order   @relation(fields: [orderId], references: [id])
+  orderId   Int
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+}
+
+model OrderLogs {
+  id           Int         @id @default(autoincrement())
+  status       OrderStatus
+  processedAt  DateTime    @default(now())
+  errorMessage String?
+  order        Order       @relation(fields: [orderId], references: [id])
+  orderId      Int
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSED
+  FAILED
+}
+
+model Category {
+  id                Int                 @id @default(autoincrement())
+  name              String              @unique
+  products          Product[]           @relation("ProductCategories")
+  ProductCategories ProductCategories[]
+}
+
+model ProductCategories {
+  productId  Int
+  categoryId Int
+  product    Product  @relation(fields: [productId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  @@id([productId, categoryId])
+}
