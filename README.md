@@ -24,8 +24,8 @@
 3. **Set Up Environment Variables**:
    Create a `.env` file in the root directory and add the following:
    ```
-   DATABASE_URL="postgresql://user:password@localhost:5432/inventory_db?schema=public"
-   REDIS_URL="redis://localhost:6379"
+   DATABASE_URL=""
+   REDIS_URL=""
    PORT=3000
    ```
 
@@ -44,3 +44,5 @@
 ## Running the Application
 
 To start the application, run:
+bash
+npm run dev
